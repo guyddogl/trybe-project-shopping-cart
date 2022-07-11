@@ -17,4 +17,9 @@ describe('2 - Teste a função fetchItem', () => {
     await fetchItem('MLB1615760527');
     expect(fetch).toBeCalledWith(url);
   });
+  test('Verifica se o retorno de fetchProducts é igual a const item', async () => {
+    expect.assertions(1);
+    const result = await fetchItem('MLB1615760527');
+    expect(result).toEqual(item);
+  });
 });
