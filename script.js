@@ -4,9 +4,13 @@ const buttonsAddToCart = document.getElementsByClassName('item__add');
 const loadingSpan = document.getElementsByClassName('loading');
 const buttonEmptyCart = document.getElementById('emptyCart');
 const cartItems = document.getElementsByClassName('cart__item');
+const totalPrice = document.getElementById('total-price');
+
+const sumPrice = (itemPrice) => totalPrice.innerText = Math.round((Number(totalPrice.innerText) + Number(itemPrice)) * 100) / 100;
 
 const emptyCart = () => {
   listCart.innerHTML = '';
+  totalPrice.innerText = 0;
   saveCartItems();
 };
 
@@ -42,6 +46,9 @@ const createProductItemElement = ({ sku, name, image }) => {
 
 const cartItemClickListener = (event) => {
   const item = event.target;
+  const innerText = event.path[0].innerText;
+  const price = innerText.substring(innerText.indexOf('$') + 1);
+  totalPrice.innerText = Math.round((Number(totalPrice.innerText) - Number(price)) * 100) / 100;
   item.remove();
   saveCartItems();
 };
@@ -75,6 +82,7 @@ window.onload = async () => {
       const result = await fetchItem(item);
       const objitem = { sku: result.id, name: result.title, salePrice: result.price };
       listCart.appendChild(createCartItemElement(objitem));
+      sumPrice(result.price);
       saveCartItems();
     });
   });
