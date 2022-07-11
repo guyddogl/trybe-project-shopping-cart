@@ -6,6 +6,7 @@ const buttonEmptyCart = document.getElementById('emptyCart');
 
 const emptyCart = () => {
   listCart.innerHTML = '';
+  saveCartItems();
 };
 
 buttonEmptyCart.addEventListener('click', emptyCart);
@@ -42,6 +43,7 @@ const cartItemClickListener = (event) => {
   const item = event.target;
   console.log(item);
   item.remove();
+  saveCartItems();
 };
 
 const createCartItemElement = ({ sku, name, salePrice }) => {
@@ -75,6 +77,8 @@ window.onload = async () => {
       const objitem = { sku: result.id, name: result.title, salePrice: result.price };
       listCart.appendChild(createCartItemElement(objitem));
       loadingSpan[0].remove();
+      saveCartItems();
     });
   });
+  getSavedCartItems();
 };
