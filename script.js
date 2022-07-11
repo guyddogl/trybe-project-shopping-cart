@@ -3,6 +3,7 @@ const listCart = document.getElementById('list-cart');
 const buttonsAddToCart = document.getElementsByClassName('item__add');
 const loadingSpan = document.getElementsByClassName('loading');
 const buttonEmptyCart = document.getElementById('emptyCart');
+const cartItems = document.getElementsByClassName('cart__item');
 
 const emptyCart = () => {
   listCart.innerHTML = '';
@@ -41,7 +42,6 @@ const createProductItemElement = ({ sku, name, image }) => {
 
 const cartItemClickListener = (event) => {
   const item = event.target;
-  console.log(item);
   item.remove();
   saveCartItems();
 };
@@ -72,13 +72,12 @@ window.onload = async () => {
   Array.from(buttonsAddToCart).forEach((button) => {
     button.addEventListener('click', async (e) => {
       const item = e.path[1].childNodes[0].outerText;
-      listCart.appendChild(loadingApi());
       const result = await fetchItem(item);
       const objitem = { sku: result.id, name: result.title, salePrice: result.price };
       listCart.appendChild(createCartItemElement(objitem));
-      loadingSpan[0].remove();
       saveCartItems();
     });
   });
   getSavedCartItems();
+  Array.from(cartItems).forEach((item) => item.addEventListener('click', cartItemClickListener));
 };
