@@ -1,6 +1,7 @@
 const sectionProducts = document.getElementById('products');
 const listCart = document.getElementById('list-cart');
 const buttonsAddToCart = document.getElementsByClassName('item__add');
+const loadingSpan = document.getElementsByClassName('loading');
 const buttonEmptyCart = document.getElementById('emptyCart');
 
 const emptyCart = () => {
@@ -39,6 +40,7 @@ const createProductItemElement = ({ sku, name, image }) => {
 
 const cartItemClickListener = (event) => {
   const item = event.target;
+  console.log(item);
   item.remove();
 };
 
@@ -50,22 +52,29 @@ const createCartItemElement = ({ sku, name, salePrice }) => {
   return li;
 };
 
+const loadingApi = () => {
+  const loading = document.createElement('span');
+  loading.innerText = 'carregando...';
+  loading.classList.add('loading');
+  return loading;
+};
+
 window.onload = async () => { 
+  sectionProducts.appendChild(loadingApi());
   const { results } = await fetchProducts('computador');
   results.forEach((item) => {
-    const objProduct = {
-      sku: item.id,
-      name: item.title,
-      image: item.thumbnail,
-    };
+    const objProduct = { sku: item.id, name: item.title, image: item.thumbnail };
     sectionProducts.appendChild(createProductItemElement(objProduct));
   });
+  loadingSpan[0].remove();
   Array.from(buttonsAddToCart).forEach((button) => {
     button.addEventListener('click', async (e) => {
       const item = e.path[1].childNodes[0].outerText;
+      listCart.appendChild(loadingApi());
       const result = await fetchItem(item);
       const objitem = { sku: result.id, name: result.title, salePrice: result.price };
       listCart.appendChild(createCartItemElement(objitem));
+      loadingSpan[0].remove();
     });
   });
 };
