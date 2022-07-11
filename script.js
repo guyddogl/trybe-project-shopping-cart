@@ -1,6 +1,13 @@
 const sectionProducts = document.getElementById('products');
 const listCart = document.getElementById('list-cart');
 const buttonsAddToCart = document.getElementsByClassName('item__add');
+const buttonEmptyCart = document.getElementById('emptyCart');
+
+const emptyCart = () => {
+  listCart.innerHTML = '';
+};
+
+buttonEmptyCart.addEventListener('click', emptyCart);
 
 const createProductImageElement = (imageSource) => {
   const img = document.createElement('img');
