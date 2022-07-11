@@ -11,4 +11,10 @@ describe('1 - Teste a função fetchProducts', () => {
     await fetchProducts("computador");
     expect(fetch).toHaveBeenCalled();
   });
+  test('Verifica se fetchProducts utilizou a url https://api.mercadolibre.com/sites/MLB/search?q=computador', async () => {
+    expect.assertions(1);
+    const url = 'https://api.mercadolibre.com/sites/MLB/search?q=computador';
+    await fetchProducts("computador");
+    expect(fetch).toBeCalledWith(url);
+  });
 });
