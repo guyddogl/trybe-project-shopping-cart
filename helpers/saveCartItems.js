@@ -1,7 +1,5 @@
-const saveCartItems = () => {
-  const saveCartList = document.getElementById('list-cart').innerHTML;
+const saveCartItems = (saveCartList, saveTotalPrice) => {
   localStorage.setItem('cartItems', saveCartList);
-  const saveTotalPrice = totalPrice.innerText;
   localStorage.setItem('totalPrice', saveTotalPrice);
 };
 
