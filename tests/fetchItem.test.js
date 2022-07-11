@@ -25,9 +25,16 @@ describe('2 - Teste a função fetchItem', () => {
   test('Verifica se fetchProducts retorna erro ao ser executada sem parâmetro', async () => {
     expect.assertions(1);
     try {
-      await await fetchItem();
+      await fetchItem();
     } catch (error) {
       expect(error).toEqual(new Error('You must provide an url'));
-    }
+    };
+  });
+  test('Verifica se fetchProducts retorna erro ao ser executada sem parâmetro', async () => {
+    try {
+      await fetchItem('guyddo');
+    } catch (error) {
+      expect(error).toEqual(new Error('resource not found'));
+    };
   });
 });
