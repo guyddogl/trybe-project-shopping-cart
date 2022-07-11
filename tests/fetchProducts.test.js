@@ -23,7 +23,6 @@ describe('1 - Teste a função fetchProducts', () => {
     expect(result).toEqual(computadorSearch);
   });
   test('Verifica se fetchProducts retorna erro ao ser executada sem parâmetro', async () => {
-    expect.assertions(1);
     try {
       await await fetchProducts();
     } catch (error) {
