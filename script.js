@@ -1,4 +1,6 @@
 const sectionProducts = document.getElementById('products');
+const listCart = document.getElementById('list-cart');
+const buttonsAddToCart = document.getElementsByClassName('item__add');
 
 const createProductImageElement = (imageSource) => {
   const img = document.createElement('img');
@@ -26,19 +28,19 @@ const createProductItemElement = ({ sku, name, image }) => {
   return section;
 };
 
-// const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
+const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
 
-// const cartItemClickListener = (event) => {
-//   // coloque seu código aqui
-// };
+const cartItemClickListener = (event) => {
+  // coloque seu código aqui
+};
 
-// const createCartItemElement = ({ sku, name, salePrice }) => {
-//   const li = document.createElement('li');
-//   li.className = 'cart__item';
-//   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
-//   li.addEventListener('click', cartItemClickListener);
-//   return li;
-// };
+const createCartItemElement = ({ sku, name, salePrice }) => {
+  const li = document.createElement('li');
+  li.className = 'cart__item';
+  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
+  li.addEventListener('click', cartItemClickListener);
+  return li;
+};
 
 window.onload = async () => { 
   const { results } = await fetchProducts('computador');
@@ -50,5 +52,17 @@ window.onload = async () => {
     };
     sectionProducts.appendChild(createProductItemElement(objProduct));
   });
-  // console.log(results);
+  Array.from(buttonsAddToCart).forEach((button) => {
+    button.addEventListener('click', async (e) => {
+      const item = e.path[1].childNodes[0].outerText;
+      const result = await fetchItem(item);
+      const objitem = {
+        sku: result.id,
+        name: result.title,
+        salePrice: result.price,
+      };
+      console.log(objitem);
+      listCart.appendChild(createCartItemElement(objitem));
+    });
+  });
 };
