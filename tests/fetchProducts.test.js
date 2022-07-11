@@ -17,4 +17,9 @@ describe('1 - Teste a função fetchProducts', () => {
     await fetchProducts("computador");
     expect(fetch).toBeCalledWith(url);
   });
+  test('Verifica se o retorno de fetchProducts é igual a const computadorSearch', async () => {
+    expect.assertions(1);
+    const result = await fetchProducts("computador");
+    expect(result).toEqual(computadorSearch);
+  });
 });
