@@ -10,6 +10,7 @@ Pontos importantes:
 - Ao adicionar ou remover um item o valor total dos produtos no carrinho é atualizado
 - O botão esvaziar carrinho exclui todos os itens do carrinho
 - O carrinho deve ser salvo no local storage e ser recuperar ao recarregar a página
+- Um elemento escrito 'carregando' aparece na tela enquanto a chamada da API está sendo executada
 
 ### Tecnologias principais
 ![HTML](https://img.shields.io/badge/-HTML-1b374b?style=for-the-badge&logo=HTML5)&nbsp;
