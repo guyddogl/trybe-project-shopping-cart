@@ -1,103 +1,145 @@
-const sectionProducts = document.getElementById('products');
-const listCart = document.getElementById('list-cart');
-const buttonsAddToCart = document.getElementsByClassName('item__add');
-const loadingSpan = document.getElementsByClassName('loading');
+const productList = document.getElementById('product-list');
+const cartList = document.getElementById('cart-list');
 const buttonEmptyCart = document.getElementById('emptyCart');
-const cartItems = document.getElementsByClassName('cart__item');
 const totalPrice = document.getElementById('total-price');
+totalPrice.innerText = 0;
+const loadingProducts = document.getElementById('loading-products');
+const loadingCart = document.getElementById('loading-cart');
+const buttonDeleteIcons = document.getElementsByClassName('delete-item');
 
-const sumPrice = (price) => {
-  totalPrice.innerText = Math.round((Number(totalPrice.innerText) + Number(price)) * 100) / 100;
+toastr.options = {
+  "closeButton": true,
+  "progressBar": true,
+  "positionClass": "toast-bottom-right",
+}
+
+const createHmtlElement = (element) => document.createElement(element);
+
+const sumPrice = (itemPrice) => totalPrice.innerText = Number(totalPrice.innerText) + Number(itemPrice);
+
+const saveCart = () => {
+  const saveCartList = cartList.innerHTML;
+  localStorage.setItem('cartItems', saveCartList);
+  const saveTotalPrice = totalPrice.innerText;
+  localStorage.setItem('totalPrice', saveTotalPrice);
 };
 
 const emptyCart = () => {
-  listCart.innerHTML = '';
+  if (cartList.childNodes.length > 0) {
+    totalPrice.innerText = 0;
+    cartList.innerHTML = '';
+    saveCart();
+    return toastr.info(`Excluiu todos os itens do carrinho`);
+  }
   totalPrice.innerText = 0;
-  saveCartItems(listCart.innerHTML);
+  cartList.innerHTML = '';
+  saveCart();
+  toastr.warning(`Não há itens no carrinho`);
 };
 
 buttonEmptyCart.addEventListener('click', emptyCart);
 
-const saveTotalPrice = () => {
-  const price = totalPrice.innerText;
-  localStorage.setItem('totalPrice', price);
-};
-
-const getSavedTotalPrice = () => localStorage.getItem('totalPrice');
-
-const createProductImageElement = (imageSource) => {
-  const img = document.createElement('img');
-  img.className = 'item__image';
-  img.src = imageSource;
-  return img;
-};
-
-const createCustomElement = (element, className, innerText) => {
-  const e = document.createElement(element);
-  e.className = className;
-  e.innerText = innerText;
-  return e;
-};
-
-const createProductItemElement = ({ sku, name, image }) => {
-  const section = document.createElement('section');
-  section.className = 'item';
-  
-  section.appendChild(createCustomElement('span', 'item__sku', sku));
-  section.appendChild(createCustomElement('span', 'item__title', name));
-  section.appendChild(createProductImageElement(image));
-  section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
-
-  return section;
-};
-
-// const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
-
-const cartItemClickListener = (event) => {
-  const item = event.target;
-  const { innerText } = event.path[0];
-  const price = innerText.substring(innerText.indexOf('$') + 1);
-  totalPrice.innerText = Math.round((Number(totalPrice.innerText) - Number(price)) * 100) / 100;
+const deleteItemFromCart = (event) => {
+  const item = event.target.parentNode;
+  const itemPrice = item.lastChild.innerText;
+  totalPrice.innerText = Number(totalPrice.innerText) - Number(itemPrice);
   item.remove();
-  saveTotalPrice();
-  saveCartItems(listCart.innerHTML);
+  saveCart();
+  toastr.info(`Produto removido do carrinho`);
 };
 
-const createCartItemElement = ({ sku, name, salePrice }) => {
-  const li = document.createElement('li');
-  li.className = 'cart__item';
-  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
-  li.addEventListener('click', cartItemClickListener);
-  return li;
-};
+const createItemCart = (data) => {
+  const itemList = createHmtlElement('li');
+  itemList.classList.add('list-group-item');
+  const id = Date.now();
+  itemList.setAttribute('id', `list-${id}`);
+  itemList.innerHTML = `<img src="${data.thumbnail}"> ${data.title.substr(0, 50) + '...'} <i id="delete-${id}" class="fa-solid fa-trash-can delete-item"></i><br/>R$<span class='item-price'>${data.price}</span>`;
+  cartList.appendChild(itemList);
+  const buttonDelete = document.getElementById(`delete-${id}`);
+  buttonDelete.addEventListener('click', deleteItemFromCart);
+  saveCart();
+  toastr.success(`Produto adicionado ao carrinho`);
+}
 
-const loadingApi = () => {
-  const loading = document.createElement('span');
-  loading.innerText = 'carregando...';
-  loading.classList.add('loading');
-  return loading;
-};
-
-listCart.innerHTML = getSavedCartItems();
-totalPrice.innerText = getSavedTotalPrice();
-
-window.onload = async () => { 
-  sectionProducts.appendChild(loadingApi());
-  const { results } = await fetchProducts('computador');
-  results.forEach((item) => {
-    const objProduct = { sku: item.id, name: item.title, image: item.thumbnail };
-    sectionProducts.appendChild(createProductItemElement(objProduct));
+const recoverCart = () => {
+  cartList.innerHTML = localStorage.getItem('cartItems');
+  totalPrice.innerText = localStorage.getItem('totalPrice');
+  Array.from(buttonDeleteIcons).forEach((item) => {
+    item.addEventListener('click', deleteItemFromCart);
   });
-  loadingSpan[0].remove();
-  Array.from(buttonsAddToCart).forEach((button) => {
-    button.addEventListener('click', async (e) => {
-      const result = await fetchItem(e.path[1].childNodes[0].outerText);
-      const objitem = { sku: result.id, name: result.title, salePrice: result.price };
-      listCart.appendChild(createCartItemElement(objitem));
-      sumPrice(result.price);
-      saveTotalPrice();
-      saveCartItems(listCart.innerHTML);
-    });
-  });
-  Array.from(cartItems).forEach((item) => item.addEventListener('click', cartItemClickListener));
+}
+
+const fetchItem = async (productUrl) => {
+  if (!productUrl) throw new Error('You must provide an url');
+  try {
+    loadingCart.style.display = 'block';
+    const URL = productUrl;
+    const result = await fetch(URL);
+    const data = await result.json();
+    loadingCart.style.display = 'none';  
+    createItemCart(data);
+    sumPrice(data.price);
+    saveCart();
+  } catch (error) {
+    return toastr.error(`Deu erro: ${error}`);
+  }
 };
+
+const addItemToCart = (event) => {
+  const item = event.target.id;
+  fetchItem(`https://api.mercadolibre.com/items/${item}`);
+};
+
+const createButtonAddToCart = (id, divCardBody) => {
+  const cardButton = createHmtlElement('a');
+  cardButton.classList.add('btn', 'btn-primary');
+  cardButton.setAttribute('id', id);
+  cardButton.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Adicionar ao carrinho';
+  cardButton.addEventListener('click', addItemToCart);
+  divCardBody.appendChild(cardButton);
+};
+
+const createCardImg = (product, divCard) => {
+  const img = createHmtlElement('img');
+  img.classList.add('card-img-top', 'thumb');
+  img.src = product.thumbnail;
+  divCard.appendChild(img);
+};
+
+const createCard = (products) => {
+  products.forEach((product) => {
+    const divCard = createHmtlElement('div');
+    const divCardBody = createHmtlElement('div');
+    const cardText = createHmtlElement('p');
+    divCard.classList.add('card');
+    divCardBody.classList.add('card-body');
+    cardText.classList.add('card-text');
+    cardText.innerHTML = `${product.title.substr(0, 50)}...<br/><br/>R$ ${product.price}`;
+    productList.appendChild(divCard);
+    createCardImg(product, divCard);
+    divCard.appendChild(divCardBody);
+    divCardBody.appendChild(cardText); 
+    createButtonAddToCart(product.id, divCardBody);
+  });
+};
+
+const getApiData = async () => {
+  try {
+    loadingProducts.style.display = 'block';
+    const URL = 'https://api.mercadolibre.com/sites/MLB/search?q=computador&limit=8';
+    const result = await fetch(URL);
+    const data = await result.json();
+    loadingProducts.style.display = 'none';
+    createCard(data.results);
+    // console.log(data.results);
+    // toastr.success('API conectada!');
+    return data;
+  } catch (error) {
+    return toastr.error(`Deu erro: ${error}`);
+  }
+};
+
+window.onload = () => {
+  getApiData();
+  recoverCart();
+}
