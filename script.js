@@ -78,6 +78,9 @@ const loadingApi = () => {
   return loading;
 };
 
+listCart.innerHTML = getSavedCartItems();
+totalPrice.innerText = getSavedTotalPrice();
+
 window.onload = async () => { 
   sectionProducts.appendChild(loadingApi());
   const { results } = await fetchProducts('computador');
@@ -96,7 +99,5 @@ window.onload = async () => {
       saveCartItems(listCart.innerHTML);
     });
   });
-  listCart.innerHTML = getSavedCartItems();
-  totalPrice.innerText = getSavedTotalPrice();
   Array.from(cartItems).forEach((item) => item.addEventListener('click', cartItemClickListener));
 };
