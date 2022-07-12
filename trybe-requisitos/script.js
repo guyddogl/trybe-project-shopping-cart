@@ -7,7 +7,7 @@ const cartItems = document.getElementsByClassName('cart__item');
 const totalPrice = document.getElementById('total-price');
 
 const sumPrice = (price) => {
-  totalPrice.innerText = Math.round((Number(totalPrice.innerText) + Number(price)) * 100) / 100;
+  totalPrice.innerText = Number(totalPrice.innerText) + Number(price);
 };
 
 const emptyCart = () => {
@@ -57,7 +57,7 @@ const cartItemClickListener = (event) => {
   const item = event.target;
   const { innerText } = event.path[0];
   const price = innerText.substring(innerText.indexOf('$') + 1);
-  totalPrice.innerText = Math.round((Number(totalPrice.innerText) - Number(price)) * 100) / 100;
+  totalPrice.innerText = Number(totalPrice.innerText) - Number(price);
   item.remove();
   saveTotalPrice();
   saveCartItems(listCart.innerHTML);
