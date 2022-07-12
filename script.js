@@ -13,10 +13,17 @@ const sumPrice = (price) => {
 const emptyCart = () => {
   listCart.innerHTML = '';
   totalPrice.innerText = 0;
-  saveCartItems();
+  saveCartItems(listCart.innerHTML);
 };
 
 buttonEmptyCart.addEventListener('click', emptyCart);
+
+const saveTotalPrice = () => {
+  const price = totalPrice.innerText;
+  localStorage.setItem('totalPrice', price);
+};
+
+const getSavedTotalPrice = () => localStorage.getItem('totalPrice');
 
 const createProductImageElement = (imageSource) => {
   const img = document.createElement('img');
@@ -52,7 +59,8 @@ const cartItemClickListener = (event) => {
   const price = innerText.substring(innerText.indexOf('$') + 1);
   totalPrice.innerText = Math.round((Number(totalPrice.innerText) - Number(price)) * 100) / 100;
   item.remove();
-  saveCartItems();
+  saveTotalPrice();
+  saveCartItems(listCart.innerHTML);
 };
 
 const createCartItemElement = ({ sku, name, salePrice }) => {
@@ -84,9 +92,11 @@ window.onload = async () => {
       const objitem = { sku: result.id, name: result.title, salePrice: result.price };
       listCart.appendChild(createCartItemElement(objitem));
       sumPrice(result.price);
-      saveCartItems();
+      saveTotalPrice();
+      saveCartItems(listCart.innerHTML);
     });
   });
-  getSavedCartItems();
+  listCart.innerHTML = getSavedCartItems();
+  totalPrice.innerText = getSavedTotalPrice();
   Array.from(cartItems).forEach((item) => item.addEventListener('click', cartItemClickListener));
 };
