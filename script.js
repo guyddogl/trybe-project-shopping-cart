@@ -5,8 +5,6 @@ const loadingSpan = document.getElementsByClassName('loading');
 const buttonEmptyCart = document.getElementById('emptyCart');
 const cartItems = document.getElementsByClassName('cart__item');
 const totalPrice = document.getElementById('total-price');
-const saveCartList = document.getElementById('list-cart').innerHTML;
-const saveTotalPrice = totalPrice.innerText;
 
 const sumPrice = (price) => {
   totalPrice.innerText = Math.round((Number(totalPrice.innerText) + Number(price)) * 100) / 100;
@@ -15,7 +13,7 @@ const sumPrice = (price) => {
 const emptyCart = () => {
   listCart.innerHTML = '';
   totalPrice.innerText = 0;
-  saveCartItems(saveCartList, saveTotalPrice);
+  saveCartItems();
 };
 
 buttonEmptyCart.addEventListener('click', emptyCart);
@@ -54,7 +52,7 @@ const cartItemClickListener = (event) => {
   const price = innerText.substring(innerText.indexOf('$') + 1);
   totalPrice.innerText = Math.round((Number(totalPrice.innerText) - Number(price)) * 100) / 100;
   item.remove();
-  saveCartItems(saveCartList, saveTotalPrice);
+  saveCartItems();
 };
 
 const createCartItemElement = ({ sku, name, salePrice }) => {
@@ -86,7 +84,7 @@ window.onload = async () => {
       const objitem = { sku: result.id, name: result.title, salePrice: result.price };
       listCart.appendChild(createCartItemElement(objitem));
       sumPrice(result.price);
-      saveCartItems(saveCartList, saveTotalPrice);
+      saveCartItems();
     });
   });
   getSavedCartItems();
